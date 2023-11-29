@@ -7,3 +7,5 @@ The process of making a good predictive model, can be split into three key stage
 3.  Model evaluation
 
 ModelWorks is a framework to connect these stages without loss of flexibility in each.
+
+![Alt text](ModelWorks.png "ModelWorks Overview")
