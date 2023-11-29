@@ -14,6 +14,7 @@ class ModelSpec():
     metrics: dict[object]
     task: str
     origin: str
+    supervised: bool = True
     preprocessing: dict[object] = None
     custom_fit: callable = None
     custom_predict: callable = None
