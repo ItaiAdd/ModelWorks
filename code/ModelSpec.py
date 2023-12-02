@@ -2,23 +2,29 @@ from dataclasses import dataclass
 from pandas import DataFrame
 
 
-@dataclass
+@dataclass(repr=False)
 class ModelSpec():
     """Class to standardise fit/predict interface of model objects and
     and, store training and tuning related information and specify
     data preprocessing.
     
     Attributes:
-        name: Identifier for this specification
-        model: Model object
+        name: Identifier for this specification.
+        model: Model object.
         params: Dictionary of parameter name: options items.
-        metrics: Dictionary of callables which compute performance metrics, metric name : callable
-        task: Modelling task ('cls' or 'reg')
-        origin: Specifies fit/predict interface
-        supervised: Whether or not the learning is supervised
-        preprocessing: Dictionary of preprocessing callables, step name : callable
-        custom_fit: Custom fit method
-        custom_predict Custom predict method
+        metrics: Dictionary of callables which compute performance 
+                 metrics, metric name : callable.
+        task: Modelling task ('cls' or 'reg').
+        origin: Specifies fit/predict interface.
+        needs_proba: Whether or not to predict class probabilities.
+        fit_model: Strores currentx trained model object.
+        supervised: Whether or not the learning is supervised.
+        preprocessing: Dictionary of preprocessing callables,
+                       step name : callable.
+        fit_params: Parameters for fit method.
+        pred_params: Parameters for prediction method.
+        custom_fit: Custom fit method.
+        custom_predict Custom predict method.
 
     Methods:
         update_history: Adds trial to tuning history.
@@ -31,14 +37,19 @@ class ModelSpec():
     metrics: dict[object]
     task: str
     origin: str
+    needs_proba: bool = False
+    fit_model: object = None
     supervised: bool = True
     preprocessing: dict[object] = None
+    fit_params: dict = None
+    pred_params: dict = None
     custom_fit: callable = None
     custom_predict: callable = None
 
 
     def __post_init__(self):
-        self.tuning_history = {col:[] for col in list({**self.params, **self.metrics}.keys)}
+        self.tuning_history = {col:[] for col in 
+                               list({**self.params, **self.metrics}.keys)}
 
 
     def update_history(self,trial):

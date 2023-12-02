@@ -3,20 +3,17 @@ class FitPredBase():
     ModelTester."""
 
     def fit_sklearn(spec, X, y=None):
-        if y:
-            model = spec.model.fit(X, y)
-        else:
-            model = spec.model.fit(X)
+        spec.fit_model = spec.model
+        spec.fit_model.fit(X, y, **spec.fit_params)
     
 
-    def predict_sklearn(spec, X, proba = False):
-        if proba == True:
-            return spec.model.predict_proba(X)
+    def predict_sklearn(spec, X):
+        if spec.needs_proba:
+            return spec.fit_model.predict_proba(X, **spec.pred_params)
         else:
-            return spec.predict(X)
+            return spec.fit_model.predict(X, **spec.pred_params)
     
-    # TODO Make Keras fitš
-    # TODO Make Keras predict
+
 
     # TODO Make PyTorch predict
     # TODO Make PyTorch fit
