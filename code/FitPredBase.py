@@ -15,7 +15,7 @@ class FitPredBase():
         else:
             return spec.predict(X)
     
-    # TODO Make Keras fit
+    # TODO Make Keras fitš
     # TODO Make Keras predict
 
     # TODO Make PyTorch predict
