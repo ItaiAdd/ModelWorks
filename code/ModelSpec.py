@@ -16,6 +16,8 @@ class ModelSpec():
                  metrics, metric name : callable.
         task: Modelling task ('cls' or 'reg').
         origin: Specifies fit/predict interface.
+        sampler: 'grid' or 'TPE'.
+        trials: If sampler = 'TPE', number of parameter combinations to try.
         needs_proba: Whether or not to predict class probabilities.
         fit_model: Strores currentx trained model object.
         supervised: Whether or not the learning is supervised.
@@ -37,6 +39,8 @@ class ModelSpec():
     metrics: dict[object]
     task: str
     origin: str
+    sampler: str
+    trials: int
     needs_proba: bool = False
     fit_model: object = None
     supervised: bool = True

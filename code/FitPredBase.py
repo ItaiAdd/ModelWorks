@@ -2,11 +2,13 @@ class FitPredBase():
     """Base class for fit/predict methods used by ModelFactory and
     ModelTester."""
 
-    def fit_sklearn(spec, X, y=None):
+    @staticmethod
+    def fit_sklearn(spec, X, params, y=None):
         spec.fit_model = spec.model
         spec.fit_model.fit(X, y, **spec.fit_params)
     
 
+    @staticmethod
     def predict_sklearn(spec, X):
         if spec.needs_proba:
             return spec.fit_model.predict_proba(X, **spec.pred_params)
@@ -24,5 +26,11 @@ class FitPredBase():
     # TODO Make CatBoost fit
     # TODO Make CatBoost predict
 
-    # TODO Make general fit: model/origin --> fits with correct method --> returns fit model
-    # TODO Make general predict: fit model/origin --> predicts with correct method --> returns y_pred
+    def fit(self, spec, X, params, y=None):
+        if spec.origin == 'sklearn':
+            self.fit_sklearn(spec, X, y)
+
+    
+    def predict(self, spec, X):
+        if spec.origin == 'sklearn':
+            return self.predict_sklearn(spec, X)
