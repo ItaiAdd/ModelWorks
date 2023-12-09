@@ -5,7 +5,7 @@ from FitPredBase import FitPredBase
 
 @dataclass(repr=False)
 class ModelWorks():
-    specs: object #instance of ModelSpec
+    specs: list[object] #instance of ModelSpec
     X: dict #the data to be fit
     y: list = None
 
@@ -29,7 +29,9 @@ class ModelWorks():
 
 # TODO Add train_test_split --> train/val sets
     def grid_tune(self, spec):
-        X, y = self.preprocess(spec)
+        if spec.preprocessing:
+            X, y = self.preprocess(spec)
+        
         param_grid = self.param_grid(spec)
 
         for trial in param_grid:
