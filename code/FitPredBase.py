@@ -3,9 +3,12 @@ class FitPredBase():
     ModelTester."""
 
     @staticmethod
-    def fit_sklearn(spec, X, params, y=None):
-        spec.fit_model = spec.model
-        spec.fit_model.fit(X, y, **spec.fit_params)
+    def fit_sklearn(spec, params, X, y=None):
+        spec.fit_model = spec.model(**params)
+        if y:
+            spec.fit_model.fit(X, y, **spec.fit_params)
+        else:
+            spec.fit_model.fit(X, **spec.fit_params)
     
 
     @staticmethod
@@ -28,7 +31,7 @@ class FitPredBase():
 
     def fit(self, spec, X, params, y=None):
         if spec.origin == 'sklearn':
-            self.fit_sklearn(spec, X, y)
+            self.fit_sklearn(spec, params, X, y)
 
     
     def predict(self, spec, X):

@@ -1,19 +1,25 @@
 from dataclasses import dataclass
 from sklearn.model_selection import ParameterGrid
-from FitPredBase import FitPredBase 
+from FitPredBase import FitPredBase
 
 
 @dataclass(repr=False)
 class ModelWorks():
     specs: object #instance of ModelSpec
-    data: list #the data to be fit
+    X: dict #the data to be fit
+    y: list = None
+
 
     def prepreprocess(self, spec):
-        # TODO add conditional for supervised/unsupervised
-        data = self.data
-        for transform in spec.preprocessing.values:
-            data = transform(data)
-        return data
+        X = self.X
+        if self.y:
+            y = self.y
+            for transform in spec.preprocessing.values:
+                X, y = transform(X, y)
+        else:
+            for transform in spec.preprocessing.values:
+                X = transform(X)
+        return X, y
     
 
     @staticmethod
@@ -21,15 +27,19 @@ class ModelWorks():
         return ParameterGrid(spec.params)
     
 
-    def grid_tune(self, spec, X, y=None):
-        if spec.supervised:
-            X, y = 
+# TODO Add train_test_split --> train/val sets
+    def grid_tune(self, spec):
+        X, y = self.preprocess(spec)
         param_grid = self.param_grid(spec)
 
         for trial in param_grid:
+            self.fit(spec, params, X, y)
+            
+
 
 
 
     # TODO Make individual model tuner
+    # TODO Implement k-fold cv
     # TODO Make overall model tuner
     # TODO Implement TPE sampler

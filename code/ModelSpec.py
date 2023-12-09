@@ -43,7 +43,7 @@ class ModelSpec():
     trials: int
     needs_proba: bool = False
     fit_model: object = None
-    supervised: bool = True
+    supervised: bool = False
     preprocessing: dict[object] = None
     fit_params: dict = None
     pred_params: dict = None
