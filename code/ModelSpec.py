@@ -36,11 +36,11 @@ class ModelSpec():
     name: str
     model: object
     params: dict
-    metrics: dict[object]
     task: str
     origin: str
     sampler: str
-    trials: int
+    metrics: dict[object] = None
+    trials: int = None
     needs_proba: bool = False
     fit_model: object = None
     supervised: bool = False

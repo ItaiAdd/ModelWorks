@@ -3,6 +3,14 @@ class FitPredBase():
     ModelTester."""
 
     @staticmethod
+    def compute_metrics(spec, pred, y=None):
+        results = {}
+        for name, metric in spec.metrics.items:
+            results[name] = metric(pred, y)
+        return results
+
+
+    @staticmethod
     def fit_sklearn(spec, params, X, y=None):
         spec.fit_model = spec.model(**params)
         if y:
