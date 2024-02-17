@@ -39,11 +39,12 @@ class ModelSpec():
     task: str
     origin: str
     sampler: str
-    metrics: dict[object] = None
-    trials: int = None
     needs_proba: bool = False
-    fit_model: object = None
     supervised: bool = False
+    metrics: dict[object] = None
+    cv = None
+    trials: int = None
+    fit_model: object = None
     preprocessing: dict[object] = None
     fit_params: dict = None
     pred_params: dict = None
@@ -52,6 +53,7 @@ class ModelSpec():
 
 
     def __post_init__(self):
+        """Initialising tuning dictionary of trialed parameters and computed metrics"""
         self.tuning_history = {col:[] for col in 
                                list({**self.params, **self.metrics}.keys)}
 

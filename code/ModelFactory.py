@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from sklearn.model_selection import ParameterGrid
+from sklearn.model_selection import ParameterGrid, train_test_split
 from FitPredBase import FitPredBase
 
 
@@ -7,47 +7,40 @@ from FitPredBase import FitPredBase
 class ModelWorks(FitPredBase):
     specs: list[object] #instance of ModelSpec
     X: dict #the data to be fit
-    y: list = None
+    y: list 
 
 
     def prepreprocess(self, spec):
         X = self.X
-        if self.y:
-            y = self.y
-            for transform in spec.preprocessing.values:
-                X, y = transform(X, y)
-        else:
-            for transform in spec.preprocessing.values:
-                X = transform(X)
+        y = self.y
+        for transform in spec.preprocessing.values:
+            X, y = transform(X, y)
         return X, y
-    
+        
 
     @staticmethod
     def param_grid(spec):
         return ParameterGrid(spec.params)
     
 
-# TODO Add train_test_split for optional metrics
-# TODO Add cv option
-# TODO Add prediction saving
     def grid_tune(self, spec):
         if spec.preprocessing:
-            X, y = self.preprocess(spec)
-        
+            X, y = self.prepreprocess(spec)
+            X_train, X_test, y_train, y_test = train_test_split(X,y)
         param_grid = self.param_grid(spec)
-
-        for trial in param_grid:
-            self.fit(spec, params, X, y)
-            pred = self.predict(spec, X)
+        for params in param_grid:
+            if spec.cv:
+                result = self.k_fold_cv(spec, params, X, y)
+            else:
+                self.fit(spec, params, X_train, y_train)
+                pred = self.predict(spec, X_test)
+                result = self.compute_metrics(spec, pred, y_test)
+            trial = {**params, **result}
+            spec.update_history(trial)
             
-
-            
-            
-
 
 
 
     # TODO Make individual model tuner
-    # TODO Implement k-fold cv
     # TODO Make overall model tuner
     # TODO Implement TPE sampler
