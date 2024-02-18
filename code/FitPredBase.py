@@ -15,34 +15,49 @@ class FitPredBase():
 
 
     @staticmethod
-    def fit_sklearn(spec, params, X, y=None):
+    def fit_sklearn(spec, params, X, y):
         spec.fit_model = spec.model(**params)
-        if y:
+        if spec.fit_params:
             spec.fit_model.fit(X, y, **spec.fit_params)
         else:
-            spec.fit_model.fit(X, **spec.fit_params)
+            spec.fit_model.fit(X, y)
     
 
     @staticmethod
     def predict_sklearn(spec, X):
         if spec.needs_proba:
-            return spec.fit_model.predict_proba(X, **spec.pred_params)
+            if spec.pred_params:
+                return spec.fit_model.predict_proba(X, **spec.pred_params)
+            else:
+                return spec.fit_model.predict_proba(X)
         else:
-            return spec.fit_model.predict(X, **spec.pred_params)
+            if spec.pred_params:
+                return spec.fit_model.predict(X, **spec.pred_params)
+            else:
+                return spec.fit_model.predict(X)
     
 
     @staticmethod
-    def fit_xgb(spec, params, X, y=None):
+    def fit_xgb(spec, params, X, y):
         spec.fit_model = spec.model(**params)
-        spec.fit_model.fit(X, y, **spec.fit_params)
+        if spec.fit_params:
+            spec.fit_model.fit(X, y, **spec.fit_params)
+        else:
+            spec.fit_model.fit(X, y)
         
     
     @staticmethod
     def predict_xgb(spec, X):
         if spec.needs_proba:
-            return spec.fit_model.predict_proba(X, **spec.pred_params)
+            if spec.pred_params:
+                return spec.fit_model.predict_proba(X, **spec.pred_params)
+            else:
+                return spec.fit_model.predict_proba(X)
         else:
-            return spec.fit_model.predict(X, **spec.pred_params)
+            if spec.pred_params:
+                return spec.fit_model.predict(X, **spec.pred_params)
+            else:
+                return spec.fit_model.predict(X)
 
 
     # TODO Make CatBoost fit
@@ -59,6 +74,8 @@ class FitPredBase():
     def predict(self, spec, X):
         if spec.origin == 'sklearn':
             return self.predict_sklearn(spec, X)
+        elif spec.origin == 'xgb':
+            return self.predict_xgb(spec, X)
 
 
     def k_fold_cv(self, spec, params, X, y):

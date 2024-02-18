@@ -4,7 +4,7 @@ from FitPredBase import FitPredBase
 
 
 @dataclass(repr=False)
-class ModelWorks(FitPredBase):
+class ModelFactory(FitPredBase):
     specs: list[object] #instance of ModelSpec
     X: dict #the data to be fit
     y: list 
@@ -13,7 +13,7 @@ class ModelWorks(FitPredBase):
     def prepreprocess(self, spec):
         X = self.X
         y = self.y
-        for transform in spec.preprocessing.values:
+        for transform in spec.preprocessing.values():
             X, y = transform(X, y)
         return X, y
         
@@ -39,6 +39,14 @@ class ModelWorks(FitPredBase):
             spec.update_history(trial)
             
 
+    def tune(self, spec):
+        if spec.sampler == 'grid':
+                self.grid_tune(spec)
+    
+
+    def tune_all(self):
+        for spec in self.specs:
+            self.tune(spec)
 
 
     # TODO Make individual model tuner

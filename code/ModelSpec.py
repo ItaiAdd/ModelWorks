@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pandas import DataFrame
 
 
@@ -12,9 +12,7 @@ class ModelSpec():
         name: Identifier for this specification.
         model: Model object.
         params: Dictionary of parameter name: options items.
-        metrics: Dictionary of callables which compute performance 
-                 metrics, metric name : callable.
-        task: Modelling task ('cls' or 'reg').
+        metrics: Dictionary of callables which compute performance metrics, metric name : callable.
         origin: Specifies fit/predict interface.
         sampler: 'grid' or 'TPE'.
         trials: If sampler = 'TPE', number of parameter combinations to try.
@@ -36,13 +34,12 @@ class ModelSpec():
     name: str
     model: object
     params: dict
-    task: str
     origin: str
-    sampler: str
+    sampler: str = 'grid'
     needs_proba: bool = False
     supervised: bool = False
     metrics: dict[object] = None
-    cv = None
+    cv: int = field(default=False)
     trials: int = None
     fit_model: object = None
     preprocessing: dict[object] = None
@@ -54,8 +51,7 @@ class ModelSpec():
 
     def __post_init__(self):
         """Initialising tuning dictionary of trialed parameters and computed metrics"""
-        self.tuning_history = {col:[] for col in 
-                               list({**self.params, **self.metrics}.keys)}
+        self.tuning_history = {col:[] for col in list({**self.params, **self.metrics}.keys())}
 
 
     def update_history(self,trial):
