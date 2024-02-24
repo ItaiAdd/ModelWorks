@@ -8,6 +8,15 @@ class FitPredBase():
 
     @staticmethod
     def compute_metrics(spec, pred, y):
+        """Computes metrics for input spec.
+           Arguments:
+           spec: Instance of ModelSpec.
+           pred: Predictions.
+           y   : correct values to compare pred to.
+
+           Returns:
+           results dictionary with keys identical to spec.metrics.keys corresponding
+           to the computed metric value"""
         results = {}
         for name, metric in spec.metrics.items():
             results[name] = metric(pred, y)
@@ -16,6 +25,12 @@ class FitPredBase():
 
     @staticmethod
     def fit_sklearn(spec, params, X, y):
+        """Fits an sklearn model.
+           Arguments:
+           spec  : Instance of ModelSpec.
+           params: Hyperparameters for the model to be fit.
+           X     : Predictors.
+           y     : Target response."""
         spec.fit_model = spec.model(**params)
         if spec.fit_params:
             spec.fit_model.fit(X, y, **spec.fit_params)
@@ -25,6 +40,12 @@ class FitPredBase():
 
     @staticmethod
     def predict_sklearn(spec, X):
+        """Computes predictions from trained sklearn model.
+           Arguments:
+           spec: Instance of ModelSpec.
+           X   : Predictors.
+           Returns:
+           Predictions if spec.needs_proba is False or class probabilities if spec.needs_proba is True"""
         if spec.needs_proba:
             if spec.pred_params:
                 return spec.fit_model.predict_proba(X, **spec.pred_params)
@@ -39,6 +60,12 @@ class FitPredBase():
 
     @staticmethod
     def fit_xgb(spec, params, X, y):
+        """Fits an XGBoost model.
+           Arguments:
+           spec  : Instance of ModelSpec.
+           params: Hyperparameters for the model to be fit.
+           X     : Predictors.
+           y     : Target response."""
         spec.fit_model = spec.model(**params)
         if spec.fit_params:
             spec.fit_model.fit(X, y, **spec.fit_params)
@@ -48,6 +75,12 @@ class FitPredBase():
     
     @staticmethod
     def predict_xgb(spec, X):
+        """Computes predictions from a trained XGBoost model.
+           Arguments:
+           spec: Instance of ModelSpec.
+           X   : Predictors.
+           Returns:
+           Predictions if spec.needs_proba is False or class probabilities if spec.needs_proba is True"""
         if spec.needs_proba:
             if spec.pred_params:
                 return spec.fit_model.predict_proba(X, **spec.pred_params)
@@ -65,6 +98,12 @@ class FitPredBase():
 
 
     def fit(self, spec, params, X, y=None):
+        """General fit methood which applies the correct fitting interface based on spec.origin
+           Arguments:
+           spec  : Instance of ModelSpec.
+           params: Hyperparameters for the model to be fit.
+           X     : Predictors.
+           y     : Target response."""
         if spec.custom_fit:
             spec.custom_fit(spec, params, X, y)
         elif spec.origin == 'sklearn':
@@ -74,6 +113,12 @@ class FitPredBase():
 
             
     def predict(self, spec, X):
+        """Generalise predict method which applies the correct prediction interface based on spec.origin.
+           Arguments:
+           spec: Instance of ModelSpec.
+           X   : Predictors.
+           Returns:
+           Predictions if spec.needs_proba is False or class probabilities if spec.needs_proba is True"""
         if spec.custom_pred:
             return spec.custom_pred(spec, X)
         elif spec.origin == 'sklearn':
@@ -83,6 +128,14 @@ class FitPredBase():
 
 
     def k_fold_cv(self, spec, params, X, y):
+        """Cross validates a model using k-fold cross validation, spec.cv specifies the number of folds.
+           Arguments:
+           spec  : Instance of ModelSpec.
+           params: Hyperparameters for the model to be fit.
+           X     : Predictors.
+           y     : Target response.
+           Returns:
+           cross validation results. Values for each metric are the mean of the values calculated after each fold"""
         kfold = KFold(n_splits=spec.cv, shuffle=True)
         inds = kfold.split(X, y)
         results = {k:[] for k in list(spec.metrics.keys())}
