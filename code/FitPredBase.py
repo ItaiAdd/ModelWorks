@@ -65,14 +65,18 @@ class FitPredBase():
 
 
     def fit(self, spec, params, X, y=None):
-        if spec.origin == 'sklearn':
+        if spec.custom_fit:
+            spec.custom_fit(spec, params, X, y)
+        elif spec.origin == 'sklearn':
            self.fit_sklearn(spec, params, X, y)
         elif spec.origin == 'xgb':
             self.fit_xgb(spec, params, X, y)
 
             
     def predict(self, spec, X):
-        if spec.origin == 'sklearn':
+        if spec.custom_pred:
+            return spec.custom_pred(spec, X)
+        elif spec.origin == 'sklearn':
             return self.predict_sklearn(spec, X)
         elif spec.origin == 'xgb':
             return self.predict_xgb(spec, X)

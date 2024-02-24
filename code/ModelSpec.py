@@ -46,7 +46,7 @@ class ModelSpec():
     fit_params: dict = None
     pred_params: dict = None
     custom_fit: callable = None
-    custom_predict: callable = None
+    custom_pred: callable = None
 
 
     def __post_init__(self):
