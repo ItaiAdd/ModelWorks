@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from sklearn.model_selection import ParameterGrid, train_test_split
 from FitPredBase import FitPredBase
+from ModelSpec import ModelSpec
 
 
 @dataclass(repr=False)
@@ -37,18 +38,20 @@ class ModelFactory(FitPredBase):
                 result = self.compute_metrics(spec, pred, y_test)
             trial = {**params, **result}
             spec.update_history(trial)
-            
+
 
     def tune(self, spec):
+        tuning_message = f"{spec.name} being tuned."
+        print(tuning_message)
         if spec.sampler == 'grid':
                 self.grid_tune(spec)
     
 
     def tune_all(self):
         for spec in self.specs:
-            self.tune(spec)
-
-
-    # TODO Make individual model tuner
-    # TODO Make overall model tuner
-    # TODO Implement TPE sampler
+            if isinstance(spec, ModelSpec):
+                self.tune(spec)
+                tuned_message = f"{spec.name} tuning complete."
+                print(tuned_message)
+            else:
+                print('Provided specification is not an instance of ModelSpec.')
