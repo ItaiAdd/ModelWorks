@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from sklearn.model_selection import ParameterGrid, train_test_split
+from optuna import create_study
+from functools import partialmethod
 from FitPredBase import FitPredBase
 from ModelSpec import ModelSpec
 
@@ -27,7 +29,10 @@ class ModelFactory(FitPredBase):
     def grid_tune(self, spec):
         if spec.preprocessing:
             X, y = self.prepreprocess(spec)
-            X_train, X_test, y_train, y_test = train_test_split(X,y)
+        else:
+            X = self.X
+            y = self.y
+        X_train, X_test, y_train, y_test = train_test_split(X,y)
         param_grid = self.param_grid(spec)
         for params in param_grid:
             if spec.cv:
@@ -38,6 +43,38 @@ class ModelFactory(FitPredBase):
                 result = self.compute_metrics(spec, pred, y_test)
             trial = {**params, **result}
             spec.update_history(trial)
+
+
+    def optuna_objective(self, spec, X, y, trial):
+        params = {}
+        for name, value in spec.params.items():
+            if type(value[0]) is int:
+                params[name] = trial.suggest_int(name, value[0], value[1])
+            elif type(value[0]) is float:
+                params[name] = trial.suggest_float(name, value[0], value[1])
+            else:
+                params[name] = trial.suggest_categorical(name, value)
+        if spec.cv:
+            result = self.k_fold_cv(spec, params, X, y)
+        else:
+            X_train, X_test, y_train, y_test = train_test_split(X, y)
+            self.fit(spec, params, X_train, y_train)
+            pred = self.predict(spec, X_test)
+            result = self.compute_metrics(spec, pred, y_test)
+        trial_record = {**params, **result}
+        spec.update_history(trial_record)
+        return result[spec.key_metric]
+    
+
+    def opptuna_tune(self, spec):
+        if spec.preprocessing:
+            X, y = self.prepreprocess(spec)
+        else:
+            X = self.X
+            y = self.y
+        objective = partialmethod(self.optuna_objective, spec=spec, X=X, y=y)
+        study = create_study()
+        study.optimize(objective, n_trials=spec.n_trials)
 
 
     def tune(self, spec):
