@@ -13,6 +13,8 @@ class ModelSpec():
         model: Model object.
         params: Dictionary of parameter name: options items.
         metrics: Dictionary of callables which compute performance metrics, metric name : callable.
+        key_metric: The metric to track if using optuner tuning.
+        n_trials: number of trials if using optuner tuning.
         origin: Specifies fit/predict interface.
         sampler: 'grid' or 'TPE'.
         trials: If sampler = 'TPE', number of parameter combinations to try.
@@ -39,6 +41,8 @@ class ModelSpec():
     needs_proba: bool = False
     supervised: bool = False
     metrics: dict[object] = None
+    key_metric: str = None
+    n_trials: int = None
     cv: int = field(default=False)
     trials: int = None
     fit_model: object = None
