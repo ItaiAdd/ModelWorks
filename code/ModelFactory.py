@@ -66,7 +66,7 @@ class ModelFactory(FitPredBase):
         return result[spec.key_metric]
     
 
-    def opptuna_tune(self, spec):
+    def optuna_tune(self, spec):
         if spec.preprocessing:
             X, y = self.prepreprocess(spec)
         else:
@@ -81,7 +81,9 @@ class ModelFactory(FitPredBase):
         tuning_message = f"{spec.name} being tuned."
         print(tuning_message)
         if spec.sampler == 'grid':
-                self.grid_tune(spec)
+            self.grid_tune(spec)
+        elif spec.sampler == 'TPE':
+            self.optuna_tune(spec)
     
 
     def tune_all(self):
