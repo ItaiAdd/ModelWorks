@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from sklearn.model_selection import ParameterGrid, train_test_split
 from optuna import create_study
-from functools import partialmethod
+from functools import partial
 from FitPredBase import FitPredBase
 from ModelSpec import ModelSpec
 
@@ -72,7 +72,7 @@ class ModelFactory(FitPredBase):
         else:
             X = self.X
             y = self.y
-        objective = partialmethod(self.optuna_objective, spec=spec, X=X, y=y)
+        objective = partial(self.optuna_objective, spec, X, y)
         study = create_study()
         study.optimize(objective, n_trials=spec.n_trials)
 
