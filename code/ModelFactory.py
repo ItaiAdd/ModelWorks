@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from sklearn.model_selection import ParameterGrid, train_test_split
 from optuna import create_study
 from functools import partial
@@ -6,7 +5,7 @@ from FitPredBase import FitPredBase
 from ModelSpec import ModelSpec
 
 
-@dataclass(repr=False)
+
 class ModelFactory(FitPredBase):
     """A class for tuning machine learning models using grid search or Optuna's TPE algorithm.
 
@@ -15,10 +14,10 @@ class ModelFactory(FitPredBase):
         X (dict): The predictors data to be fit.
         y (list): The response data.
     """
-
-    specs: list[object]  # instance of ModelSpec
-    X: dict  # the data to be fit
-    y: list
+    def __init__(self, specs, X, y):
+        self.specs = specs
+        self.X = X
+        self.y = y
 
     def prepreprocess(self, spec):
         """Applies preprocessing steps stored in the input model specification to instantiated data X and y.
